@@ -5513,6 +5513,9 @@
           "Create a scale set with Host Encryption using encryptionAtHost property.": {
             "$ref": "./examples/virtualMachineScaleSetExamples/VirtualMachineScaleSet_Create_WithEncryptionAtHost.json"
           },
+          "Create a scale set with Max Instance Percent Per Zone Policy enabled": {
+            "$ref": "./examples/virtualMachineScaleSetExamples/VirtualMachineScaleSet_Create_WithMaxInstancePercentPerZonePolicy.json"
+          },
           "Create a scale set with Network Interfaces with public ip address dns settings.": {
             "$ref": "./examples/virtualMachineScaleSetExamples/VirtualMachineScaleSet_Create_FromWithNetworkInterfaceWithDnsSettings.json"
           },
@@ -5579,6 +5582,9 @@
           "Create a scale set with password authentication.": {
             "$ref": "./examples/virtualMachineScaleSetExamples/VirtualMachineScaleSet_Create_WithPasswordAuthentication.json"
           },
+          "Create a scale set with placement policy 'Auto'": {
+            "$ref": "./examples/virtualMachineScaleSetExamples/VirtualMachineScaleSet_Create_WithPlacement.json"
+          },
           "Create a scale set with premium storage.": {
             "$ref": "./examples/virtualMachineScaleSetExamples/VirtualMachineScaleSet_Create_WithPremiumStorage.json"
           },
@@ -5617,6 +5623,9 @@
           },
           "Create a virtual machine scale set with high-speed interconnect placement.": {
             "$ref": "./examples/virtualMachineScaleSetExamples/VirtualMachineScaleSet_Create_WithHighSpeedInterconnectPlacement.json"
+          },
+          "Create a zones-auto scale set with Max Zone Count": {
+            "$ref": "./examples/virtualMachineScaleSetExamples/VirtualMachineScaleSet_Create_WithMaxZoneCount.json"
           },
           "Create or update a scale set with capacity reservation.": {
             "$ref": "./examples/virtualMachineScaleSetExamples/VirtualMachineScaleSet_Create_WithCapacityReservation.json"
@@ -7411,6 +7420,76 @@
             "$ref": "./examples/virtualMachineScaleSetExamples/VirtualMachineScaleSetRollingUpgrade_GetLatest_MinimumSet_Gen.json"
           }
         }
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/scaleOut": {
+      "post": {
+        "operationId": "VirtualMachineScaleSets_ScaleOut",
+        "tags": [
+          "VirtualMachineScaleSets"
+        ],
+        "description": "Scales out one or more virtual machines in a VM scale set.",
+        "parameters": [
+          {
+            "$ref": "../../../../../../common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../common-types/resource-management/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../common-types/resource-management/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "vmScaleSetName",
+            "in": "path",
+            "description": "The name of the VM scale set.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "parameters",
+            "in": "body",
+            "description": "The input object for ScaleOut API.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/VMScaleSetScaleOutInput"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded."
+          },
+          "202": {
+            "description": "Resource operation accepted.",
+            "headers": {
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              },
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../common-types/v1/common.json#/definitions/CloudError"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "VirtualMachineScaleSet Scale Out.": {
+            "$ref": "./examples/virtualMachineScaleSetExamples/VirtualMachineScaleSet_ScaleOut.json"
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "location"
+        },
+        "x-ms-long-running-operation": true
       }
     },
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/setOrchestrationServiceState": {
@@ -9910,6 +9989,9 @@
           "Create a VM with HibernationEnabled": {
             "$ref": "./examples/virtualMachineExamples/VirtualMachine_Create_WithHibernationEnabled.json"
           },
+          "Create a VM with Fips 140-3 Enabled": {
+            "$ref": "./examples/virtualMachineExamples/VirtualMachine_Create_WithFips1403Enabled.json"
+          },
           "Create a VM with ProxyAgent Settings of enabled and mode.": {
             "$ref": "./examples/virtualMachineExamples/VirtualMachine_Create_WithProxyAgentSettings.json"
           },
@@ -12250,6 +12332,10 @@
         "hibernationEnabled": {
           "type": "boolean",
           "description": "The flag that enables or disables hibernation capability on the VM."
+        },
+        "enableFips1403Encryption": {
+          "type": "boolean",
+          "description": "The flag enables the usage of FIPS 140-3 compliant cryptography on the protectedSettings of an extension. Learn more at: https://aka.ms/linuxagentfipssupport"
         }
       }
     },
@@ -15011,6 +15097,22 @@
         }
       ]
     },
+    "MaxInstancePercentPerZonePolicy": {
+      "type": "object",
+      "description": "The configuration parameters used to limit the number of virtual machines per availability zone in the virtual machine scale set.",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Specifies whether maxInstancePercentPerZonePolicy should be enabled on the virtual machine scale set."
+        },
+        "value": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Limit on the number of instances in each zone as a percentage of the total capacity of the virtual machine scale set.",
+          "maximum": 100
+        }
+      }
+    },
     "MigrateToVirtualMachineScaleSetInput": {
       "type": "object",
       "description": "Describes the Virtual Machine Scale Set to migrate from Availability Set.",
@@ -15601,7 +15703,7 @@
         "lastStatusChangeTime": {
           "type": "string",
           "format": "date-time",
-          "description": "The last time when the operation status changed. Minimum API version for this property is 2025-04-01.",
+          "description": "The last UTC time when the operation status changed. Minimum API version for this property is 2025-04-01.",
           "readOnly": true
         }
       }
@@ -15780,22 +15882,22 @@
     },
     "Placement": {
       "type": "object",
-      "description": "Describes the user-defined constraints for virtual machine hardware placement.",
+      "description": "Describes the user-defined constraints for resource hardware placement.",
       "properties": {
         "zonePlacementPolicy": {
           "$ref": "#/definitions/ZonePlacementPolicyType",
-          "description": "Specifies the policy for virtual machine's placement in availability zone. Possible values are: **Any** - An availability zone will be automatically picked by system as part of virtual machine creation."
+          "description": "Specifies the policy for resource's placement in availability zone. Possible values are: **Any** (used for Virtual Machines), **Auto** (used for Virtual Machine Scale Sets) - An availability zone will be automatically picked by system as part of resource creation."
         },
         "includeZones": {
           "type": "array",
-          "description": "This property supplements the 'zonePlacementPolicy' property. If 'zonePlacementPolicy' is set to 'Any', availability zone selected by the system must be present in the list of availability zones passed with 'includeZones'. If 'includeZones' is not provided, all availability zones in region will be considered for selection.",
+          "description": "This property supplements the 'zonePlacementPolicy' property. If 'zonePlacementPolicy' is set to 'Any'/'Auto', availability zone selected by the system must be present in the list of availability zones passed with 'includeZones'. If 'includeZones' is not provided, all availability zones in region will be considered for selection.",
           "items": {
             "type": "string"
           }
         },
         "excludeZones": {
           "type": "array",
-          "description": "This property supplements the 'zonePlacementPolicy' property. If 'zonePlacementPolicy' is set to 'Any', availability zone selected by the system must not be present in the list of availability zones passed with 'excludeZones'. If 'excludeZones' is not provided, all availability zones in region will be considered for selection.",
+          "description": "This property supplements the 'zonePlacementPolicy' property. If 'zonePlacementPolicy' is set to 'Any'/'Auto', availability zone selected by the system must not be present in the list of availability zones passed with 'excludeZones'. If 'excludeZones' is not provided, all availability zones in region will be considered for selection.",
           "items": {
             "type": "string"
           }
@@ -16252,6 +16354,10 @@
         "automaticZoneRebalancingPolicy": {
           "$ref": "#/definitions/AutomaticZoneRebalancingPolicy",
           "description": "The configuration parameters used while performing automatic AZ balancing."
+        },
+        "zoneAllocationPolicy": {
+          "$ref": "#/definitions/ZoneAllocationPolicy",
+          "description": "The configuration parameters used while performing zone allocation."
         }
       }
     },
@@ -18283,6 +18389,34 @@
         }
       }
     },
+    "VMScaleSetScaleOutInput": {
+      "type": "object",
+      "description": "The input for ScaleOut",
+      "properties": {
+        "capacity": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Specifies the number of virtual machines in the scale set."
+        },
+        "properties": {
+          "$ref": "#/definitions/VMScaleSetScaleOutInputProperties",
+          "description": "The input properties for ScaleOut"
+        }
+      },
+      "required": [
+        "capacity"
+      ]
+    },
+    "VMScaleSetScaleOutInputProperties": {
+      "type": "object",
+      "description": "The input properties for ScaleOut",
+      "properties": {
+        "zone": {
+          "type": "string",
+          "description": "The zone in which the scale out is requested for the virtual machine scale set."
+        }
+      }
+    },
     "VMSizeProperties": {
       "type": "object",
       "description": "Specifies VM Size Property settings on the virtual machine.",
@@ -19871,6 +20005,10 @@
           "type": "string",
           "description": "Etag is property returned in Create/Update/Get response of the VMSS, so that customer can supply it in the header to ensure optimistic updates",
           "readOnly": true
+        },
+        "placement": {
+          "$ref": "#/definitions/Placement",
+          "description": "Placement section specifies the user-defined constraints for virtual machine scale set hardware placement. This property cannot be changed once VMSS is provisioned. Minimum api-version: 2025-04-01."
         }
       },
       "allOf": [
@@ -23050,6 +23188,20 @@
           "type": "string",
           "format": "date-time",
           "description": "This is used to install patches that were published on or before this given max published date."
+        },
+        "patchNameMasksToInclude": {
+          "type": "array",
+          "description": "This is used to include patches that match the given patch name masks. Alphanumeric strings and wildcard expressions consisting of * and ? are only supported as input values in the list. Null, empty and only whitespaces strings as inputs values are not supported.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "patchNameMasksToExclude": {
+          "type": "array",
+          "description": "This is used to exclude patches that match the given patch name masks. Alphanumeric strings and wildcard expressions consisting of * and ? are only supported as input values in the list. Null, empty and only whitespaces strings as inputs values are not supported.",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
@@ -23170,11 +23322,27 @@
         ]
       }
     },
+    "ZoneAllocationPolicy": {
+      "type": "object",
+      "description": "The configuration parameters for zone allocation of a virtual machine scale set.",
+      "properties": {
+        "maxZoneCount": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The maximum number of availability zones to use if the ZonePlacementPolicy is 'Auto'. If not specified, all availability zones will be used."
+        },
+        "maxInstancePercentPerZonePolicy": {
+          "$ref": "#/definitions/MaxInstancePercentPerZonePolicy",
+          "description": "The configuration parameters used to limit the number of virtual machines per availability zone in the virtual machine scale set."
+        }
+      }
+    },
     "ZonePlacementPolicyType": {
       "type": "string",
-      "description": "Specifies the policy for virtual machine's placement in availability zone. Possible values are: **Any** - An availability zone will be automatically picked by system as part of virtual machine creation.",
+      "description": "Specifies the policy for resource's placement in availability zone. Possible values are: **Any** (used for Virtual Machines), **Auto** (used for Virtual Machine Scale Sets) - An availability zone will be automatically picked by system as part of resource creation.",
       "enum": [
-        "Any"
+        "Any",
+        "Auto"
       ],
       "x-ms-enum": {
         "name": "ZonePlacementPolicyType",
@@ -23183,6 +23351,11 @@
           {
             "name": "Any",
             "value": "Any"
+          },
+          {
+            "name": "Auto",
+            "value": "Auto",
+            "description": "Automatic zone placement in a Virtual Machine Scale Set."
           }
         ]
       }
